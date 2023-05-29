@@ -1,7 +1,3 @@
-import pytest
-
-
-@pytest.mark.browser_context
 def test_login_with_correct_credentials(sauce_demo_without_login_page):
     page = sauce_demo_without_login_page
 
@@ -14,7 +10,6 @@ def test_login_with_correct_credentials(sauce_demo_without_login_page):
     assert products_header.is_visible(), "User is unable to login."
 
 
-@pytest.mark.browser_context
 def test_login_with_incorrect_credentials(sauce_demo_without_login_page):
     page = sauce_demo_without_login_page
 
@@ -29,8 +24,14 @@ def test_login_with_incorrect_credentials(sauce_demo_without_login_page):
     assert expected_error_text in error_text.inner_text(), "Correct error message is not displayed."
 
 
-def test_logout(sauce_demo_page):
-    page = sauce_demo_page
+def test_logout(sauce_demo_without_login_page):
+    page = sauce_demo_without_login_page
+
+    # Login
+    page.locator("#user-name").fill("standard_user")
+    page.locator("#password").fill("secret_sauce")
+    login_button = page.locator("#login-button")
+    login_button.click()
 
     # Logout
     page.locator("#react-burger-menu-btn").click()
@@ -42,14 +43,7 @@ def test_logout(sauce_demo_page):
 
 """
 Execute commands:
-pytest -s -v
-pytest -s -v -m sanity
-pytest -s -v -m regression
-pytest -s -v -m "not sanity"
-pytest -s -v -m "sanity and regression"
-pytest pytest_fw/conftest_test.py -s -v --headed --browser=webkit
-pytest pytest_fw/conftest_test.py -s -v --headed --browser=webkit --browser=chromium
-pytest pytest_fw/conftest_test.py -s -v --headed --browser-channel=chromium
-pytest pytest_fw/conftest_test.py -s -v -m browser_context --headed --device="iPhone 8"
-pytest pytest_fw/conftest_test.py -s -v -m browser_context --headed --device="iPhone 8" --browser=webkit
+pytest pytest_fw/parallel_execution_test.py -s -v -n 3 --headed --html=report.html
+pytest pytest_fw/ -s -v -n 3 --headed --html=report.html --self-contained-html
+pytest pytest_fw/ -s -v -n 3 --headed --html=report.html --self-contained-html --capture=tee-sys
 """
